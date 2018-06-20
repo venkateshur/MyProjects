@@ -13,25 +13,22 @@ import java.util.Properties;
 public class ConsumerExample {
 
   public static void main(String[] args) {
+	  String topicName = args[0];
+      String bootStrapServers = args[1];
+      
     Properties configs = new Properties();
-    configs.put("bootstrap.servers", "localhost:9092");
+    configs.put("bootstrap.servers", bootStrapServers);
     configs.put("session.timeout.ms", "10000");
     configs.put("group.id", "test");
-    configs.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+    configs.put("key.deserializer", "org.apache.kafka.common.serialization.IntegerSerializer");
     configs.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-    KafkaConsumer<String, String> consumer = new KafkaConsumer<>(configs);
-    consumer.subscribe(Arrays.asList("test1"));
+    KafkaConsumer<Integer, String> consumer = new KafkaConsumer<Integer, String>(configs);
+    consumer.subscribe(Arrays.asList(topicName));
     while (true) {
-      ConsumerRecords<String, String> records = consumer.poll(500);
-      for (ConsumerRecord<String, String> record : records) {
-        switch (record.topic()) {
-          case "test1":
-            System.out.println(record.value());
-            break;
-          default:
-            throw new IllegalStateException("get message on topic " + record.topic());
+      ConsumerRecords<Integer, String> records = consumer.poll(500);
+      for (ConsumerRecord<Integer, String> record : records) {
+    	  System.out.println("Received message: (" + record.key() + ", " + record.value() + ") at offset " + record.offset());;
         }
       }
     }
   }
-}
