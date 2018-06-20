@@ -1,8 +1,7 @@
 package com.kafka.consumer;
 
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.consumer.*;
+
 
 import java.util.Arrays;
 import java.util.Properties;
@@ -13,6 +12,10 @@ import java.util.Properties;
 public class ConsumerExample {
 
   public static void main(String[] args) {
+	  if(args.length != 2){
+		  System.out.println("provide the required 2 arguments ...");
+		  System.exit(-1);
+	  }
 	  String topicName = args[0];
       String bootStrapServers = args[1];
       

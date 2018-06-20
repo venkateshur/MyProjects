@@ -2,13 +2,16 @@ package com.kafka.producer;
 
 import org.apache.kafka.clients.producer.*;
 import java.util.Properties;
-import java.util.*;
 
 /**
  * yashwant
  */
 public class ProducerExample {
    public static void main(String[] args) throws Exception{
+	   if(args.length != 2){
+			  System.out.println("provide the required 2 arguments ...");
+			  System.exit(-1);
+		  }
           String topicName = args[0];
           String broakerList = args[1];
           
@@ -20,6 +23,7 @@ public class ProducerExample {
       
 //properties for producer
       Producer<Integer, String> producer = new KafkaProducer<Integer, String>(props);
+      
  //send messages to my-topic
       for(int i = 0; i < 100; i++) {
           ProducerRecord<Integer, String> producerRecord = new ProducerRecord<Integer, String>(topicName, i, "Test Message #" + Integer.toString(i));
@@ -33,15 +37,6 @@ public class ProducerExample {
     }
   }
 }
-  class MyProducerCallback implements Callback {
 
-	@Override
-       public  void onCompletion(RecordMetadata recordMetadata, Exception e) {
-        if (e != null)
-            System.out.println("AsynchronousProducer failed with an exception");
-                else
-                    System.out.println("AsynchronousProducer call Success:");
-       }	
-}
        
 	   
