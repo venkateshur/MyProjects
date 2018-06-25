@@ -7,3 +7,28 @@
         System.setProperty("java.security.auth.login.config", kafkaJassconfPath);
         System.setProperty("javax.security.auth.useSubjectCredsOnly", "false");
         System.setProperty("sun.security.krb5.debug", "true");
+
+
+
+jaas file
+
+KafkaClient {
+ com.sun.security.auth.module.Krb5LoginModule required
+ doNotPrompt=true
+ useTicketCache=true
+ principal="ctadmin@HSCALE.COM"
+ useKeyTab=true
+ serviceName="kafka"
+ keyTab="/etc/security/keytabs/ctadmin.keytab"
+ client=true;
+};
+
+KafkaClient {
+ com.sun.security.auth.module.Krb5LoginModule required
+ doNotPrompt=true
+ useTicketCache=true
+ principal="kafka-user@MYCORP.NET"
+ useKeyTab=true
+ keyTab="/home/kafka-user/kafka-user.keytab"
+ client=true;
+};
