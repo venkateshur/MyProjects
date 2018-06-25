@@ -1,0 +1,9 @@
+          String topicName = args[0];
+          String broakerList = args[1];
+          String krb5ConfPath = args[2];
+          String kafkaJassconfPath = args[3];
+        		  
+        System.setProperty("java.security.krb5.conf", krb5ConfPath);
+        System.setProperty("java.security.auth.login.config", kafkaJassconfPath);
+        System.setProperty("javax.security.auth.useSubjectCredsOnly", "false");
+        System.setProperty("sun.security.krb5.debug", "true");
