@@ -1,0 +1,12 @@
+this code is just to read the json file, show the results
+val readJson = sqlContext.read.option("inferschema", "true").format("json").load("/Users/venkatesh.uppada/Downloads/employee.json")
+val showDf = readJson.show(50,false)
+
+if you want to move the data to hive
+then use below code
+import org.apache.spark.sql.hive.HiveContext
+val hiveContext = new org.apache.spark.sql.hive.HiveContext(sc)
+val readJson = hiveContext.read.option("inferschema", "true").format("json").load("/Users/venkatesh.uppada/Downloads/employee.json")
+val HiveContext = new org.apache.spark.sql.hive.HiveContext(sc)
+val createHiveTable = readJson.write().mode("overwrite").saveAsTable("Employee")
+
