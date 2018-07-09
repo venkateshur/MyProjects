@@ -1,0 +1,14 @@
+val testDf = sqlContext.createDataFrame(Seq((12345, "Venkatesh", "IT", 40000.00),
+                                      (12346, "Ram,esh", "IT", 70000.00),
+                                      (12347, "Sur,,esh", "AD", 60000.00),
+                                      (12348, "Sowmya", "MD", 40000.00),
+                                      (12349, "Neelima", "CT", 30000.00),
+                                      (12311, "Mahesh", "IT", 40000.00),
+                                      (12322, "Harish", "GT", 50000.00),
+                                      (86906, null, "IT", 20000.00))).toDF("EmpId", "Name", "Dept", "Salary")
+//Writing Json
+val writeJson = testDf.write.mode("overwrite").format("json").save("/FileStore/mystuff/employee1.json")
+
+//Reading Json
+val readJson = sqlContext.read.format("json").load("/FileStore/mystuff/employee1.json")
+val showJson = readJson.show(10,false)
