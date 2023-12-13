@@ -1,0 +1,42 @@
+from pyspark.context import SparkContext
+from awsglue.context import GlueContext
+from pyspark.context import SparkConf
+from awsglue.transforms import *
+from awsglue.utils import getResolvedOptions
+from pyspark.context import SparkContext
+from pyspark.sql import SparkSession
+
+# Replace these placeholders with your actual values
+s3_bucket = "your_bucket"
+s3_key = "your_key"
+dynamodb_table = "your_table"
+region = "your_region"
+
+# Create Spark and Glue contexts
+spark_context = SparkContext.getOrCreate()
+glue_context = GlueContext(spark_context)
+
+# Create a DynamicFrame from the CSV file in S3
+csv_dynamic_frame = glue_context.create_dynamic_frame.from_catalog(database = "your_database",
+                                                                   table_name = "your_table",
+                                                                   transformation_ctx = "csv_dynamic_frame")
+
+# Transformations if needed
+# For example, you can select specific columns
+# csv_dynamic_frame = csv_dynamic_frame.select_fields(['column1', 'column2'])
+
+# Create a GlueContext and DynamoDB sink connection options
+glue_context = GlueContext(SparkContext.getOrCreate())
+dynamodb_options = {
+    "dynamodb.region": region,
+    "dynamodb.output.tableName": dynamodb_table
+}
+
+# Write the DynamicFrame to DynamoDB
+glue_context.write_dynamic_frame.from_catalog(frame = csv_dynamic_frame,
+                                               catalog_database = "your_database",
+                                               catalog_table = "your_table",
+                                               connection_options = dynamodb_options)
+
+# Commit the job
+job.commit()
