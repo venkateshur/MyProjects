@@ -19,3 +19,38 @@ dynamicFrame = glueContext.create_dynamic_frame.from_options(
         # "optimizePerformance": True,
     },
 )
+
+
+from pyspark.context import SparkContext
+from awsglue.context import GlueContext
+from awsglue.dynamicframe import DynamicFrame
+
+# Create a SparkContext and GlueContext
+sc = SparkContext()
+glueContext = GlueContext(sc)
+
+# Sample data for DynamicFrame
+data = [("John", 28, "New York"),
+        ("Jane", 35, "San Francisco"),
+        ("Bob", 40, "Los Angeles")]
+
+# Define schema for DynamicFrame
+schema = ["name", "age", "city"]
+
+# Create a DynamicFrame
+dynamic_frame = DynamicFrame.from_tuples(data, glueContext, schema)
+
+# DynamoDB output options
+output_options = {
+    "dynamodb.output.tableName": "YourDynamoDBTableName",
+    "dynamodb.throughput.write.percent": "1.0"
+}
+
+# Write the DynamicFrame to DynamoDB
+glueContext.write_dynamic_frame.from_catalog(
+    frame=dynamic_frame,
+    catalog_connection="YourCatalogConnectionName",
+    connection_options=output_options,
+    format="dynamodb"
+)
+
