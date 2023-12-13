@@ -8,3 +8,14 @@ data = {
 # Convert the dictionary to a Spark DataFrame
 df = spark.createDataFrame(list(zip(data['name'], data['age'], data['city'])), 
                             schema=['name', 'age', 'city'])
+
+
+dynamicFrame = glueContext.create_dynamic_frame.from_options(
+    connection_type="s3",
+    connection_options={"paths": ["s3://s3path"]},
+    format="csv",
+    format_options={
+        "withHeader": True,
+        # "optimizePerformance": True,
+    },
+)
