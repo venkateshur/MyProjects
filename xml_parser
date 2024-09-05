@@ -1,0 +1,82 @@
+import pandas as pd
+import xml.etree.ElementTree as ET
+import os
+
+def parse_element(element, parent_path=""):
+    """
+    Recursively parse XML element and its children, flattening the structure.
+    
+    Parameters:
+    - element: The current XML element to parse
+    - parent_path: The path of parent elements to use as a prefix for column names
+    
+    Returns:
+    - A dictionary representing the flattened structure of the element
+    """
+    parsed_data = {}
+    
+    # Combine parent path and current element's tag
+    path = f"{parent_path}_{element.tag}" if parent_path else element.tag
+
+    # If element has children, recurse into them
+    if list(element):
+        for child in element:
+            parsed_data.update(parse_element(child, path))
+    else:
+        # Otherwise, add the element's text as a value, if available
+        parsed_data[path] = element.text
+
+    # Also include attributes as separate columns
+    for key, value in element.attrib.items():
+        parsed_data[f"{path}_@{key}"] = value
+
+    return parsed_data
+
+def flatten_xml_to_df(xml_file):
+    """
+    Flatten an XML file into a pandas DataFrame, including nested elements and attributes.
+    """
+    tree = ET.parse(xml_file)
+    root = tree.getroot()
+
+    rows = []
+    
+    # For each child of the root element, parse its structure
+    for child in root:
+        rows.append(parse_element(child))
+    
+    # Convert the list of rows into a pandas DataFrame
+    df = pd.DataFrame(rows)
+    
+    # Replace `/` with `_` in the column names
+    df.columns = df.columns.str.replace('/', '_', regex=False)
+    
+    return df
+
+def xml_to_parquet(xml_directory, output_parquet_directory):
+    """
+    Convert multiple XML files to Parquet files, including handling nested XML structures.
+    """
+    # Ensure the output directory exists
+    if not os.path.exists(output_parquet_directory):
+        os.makedirs(output_parquet_directory)
+
+    for xml_file in os.listdir(xml_directory):
+        if xml_file.endswith(".xml"):
+            xml_path = os.path.join(xml_directory, xml_file)
+            
+            # Flatten the XML to a DataFrame
+            df = flatten_xml_to_df(xml_path)
+            
+            # Define the output Parquet file path
+            parquet_file = os.path.join(output_parquet_directory, xml_file.replace('.xml', '.parquet'))
+            
+            # Write the DataFrame to a Parquet file
+            df.to_parquet(parquet_file, index=False, engine='pyarrow')
+            print(f"Converted {xml_file} to {parquet_file}")
+
+# Example Usage
+xml_directory = 'path_to_your_xml_files'
+output_parquet_directory = 'path_to_output_parquet_files'
+
+xml_to_parquet(xml_directory, output_parquet_directory)
