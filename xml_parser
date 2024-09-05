@@ -1,6 +1,7 @@
 import pandas as pd
 import xml.etree.ElementTree as ET
 import os
+import re
 
 def parse_element(element, parent_path=""):
     """
@@ -32,6 +33,18 @@ def parse_element(element, parent_path=""):
 
     return parsed_data
 
+def rename_columns(df):
+    """
+    Function to rename DataFrame columns by removing everything before the last '@' or ':'.
+    """
+    def extract_column_name(col):
+        # Extract the part after the last '@' or ':' or use the full name if not found
+        return re.split('[@:]', col)[-1]
+
+    # Apply renaming function to all columns
+    df.columns = [extract_column_name(col) for col in df.columns]
+    return df
+
 def flatten_xml_to_df(xml_file):
     """
     Flatten an XML file into a pandas DataFrame, including nested elements and attributes.
@@ -48,8 +61,8 @@ def flatten_xml_to_df(xml_file):
     # Convert the list of rows into a pandas DataFrame
     df = pd.DataFrame(rows)
     
-    # Replace `/` with `_` in the column names
-    df.columns = df.columns.str.replace('/', '_', regex=False)
+    # Rename columns to clean up the names
+    df = rename_columns(df)
     
     return df
 
